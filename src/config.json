@@ -1,0 +1,6 @@
+{
+    "wsport":   8090,
+    "rpcport":  8091,
+    /* redis消息队列有效期 */
+    "redisQueueExpires": 86400
+}

@@ -1,0 +1,24 @@
+{
+  "name": "wspusher",
+  "version": "1.0.0",
+  "description": "websocket推送服务",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon index.js",
+    "debug": "concurrently \"npm start\" \"nodemon examples\\webserver.js \""
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.16.2",
+    "ioredis": "^3.2.1",
+    "socket.io": "^2.0.4"
+  },
+  "devDependencies": {
+    "concurrently": "^3.5.1",
+    "cross-env": "^5.1.1",
+    "eslint": "^4.11.0",
+    "nodemon": "^1.12.1"
+  }
+}
