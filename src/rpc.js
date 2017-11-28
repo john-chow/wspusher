@@ -6,6 +6,10 @@ const Producer = require('./redis/producer')
 app.producer = new Producer();
 
 app.get('/:project/broadcast', function(req, res) {
+    let project = req.params.project,
+        room = '',
+        message = '';
+    app.producer.broadcast(project, room, message);
 });
 
 app.get('/:project/notice/:userid', function(req, res) {

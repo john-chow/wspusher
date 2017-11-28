@@ -5,6 +5,15 @@ class Producer {
     constructor() {
         this.redisclient = redis.getClient();
     }
+    async broadcast(project, room, message) {
+        let roomkey = genRoomkey(room);
+        let users = await [];
+        users.map((uid) => {
+            let queuekey = genQueueKey(uid);
+            this.redisclient.rpushx(queuekey, message);
+        })
+        await this.redisclient.publish(redis.CHANNEL, users.join(','))
+    }
     async joinRoom(project, room, userid) {
         let roomkey = redis.genRoomkey(project, room);
         let res = await [
@@ -20,8 +29,6 @@ class Producer {
     clearRoom(project, room) {
         let roomkey = redis.genRoomkey(project, room);
         return this.redisclient.del(roomkey);
-    }
-    async broadcast(project, room, message) {
     }
 }
 
