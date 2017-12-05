@@ -21,11 +21,28 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.7.3/socket.io.min.js"></script>
     <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
     <script>
+      const ProjectName = 'WspusherDemo'
       $(function () {
-        var socket = io('http://localhost:8090');
+        var socket = io('http://localhost:8090', {
+          query:  {project: ProjectName, userid: 1}
+        });
+        socket.on(ProjectName, function(messages) {
+          messages.forEach(function(element) {
+            alert(`Websocket推送: ${element}`);
+          }, this);
+          console.log(messages);
+        })
         $('form').submit(function() {
-          socket.emit('chat message', $('#m').val());
-          $('#m').val('');
+          $.ajax({
+            url:    '/emit',
+            type:   'POST',
+            data:   {
+              content:  $('#m').val(),
+            },
+            success:  function() {
+              $('#m').val('');
+            }
+          })
           return false;
         });
       });

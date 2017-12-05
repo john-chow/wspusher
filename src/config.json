@@ -1,6 +1,9 @@
 {
+    "wsserver": "localhost",
     "wsport":   8090,
+    "rpcserver": "localhost",
     "rpcport":  8091,
-    /* redis消息队列有效期 */
+    "channel":  "common",
+    "DEFT_NUM_MESSAGES_TO_PULL":  20,
     "redisQueueExpires": 86400
 }

@@ -1,18 +1,23 @@
 const redis = require('./redis');
-const Config = require();
+const Config = require('./../config.json');
 
 class Producer {
     constructor() {
         this.redisclient = redis.getClient();
     }
     async broadcast(project, room, message) {
-        let roomkey = genRoomkey(room);
+        let roomkey = redis.genRoomkey(room);
         let users = await [];
         users.map((uid) => {
             let queuekey = genQueueKey(uid);
             this.redisclient.rpushx(queuekey, message);
         })
-        await this.redisclient.publish(redis.CHANNEL, users.join(','))
+        await this.redisclient.publish(redis.Channel, users.join(','))
+    }
+    notice(project, userid, message) {
+        let queuekey = redis.genQueuekey(project, userid);
+        this.redisclient.rpushx(queuekey, message);
+        this.redisclient.publish(redis.Channel, `${project}-${userid}`);
     }
     async joinRoom(project, room, userid) {
         let roomkey = redis.genRoomkey(project, room);
