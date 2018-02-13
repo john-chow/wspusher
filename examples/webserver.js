@@ -2,6 +2,8 @@ var express = require('express')
 var app = express()
 const http = require('http')
 const qs = require('querystring'); 
+const axios = require('axios');
+const Utils = require('./utils');
 
 var bodyParser = require('body-parser');
 app.use(bodyParser.json()); // support json encoded bodies
@@ -32,6 +34,12 @@ app.post('/emit', function(req, res) {
     });
     r.write(contentstr);
     r.end();
+    res.status(200).send();
+})
+
+app.get('/joinroom/:roomid', async (req, res) => {
+    let url = Utils.composeRpcUrl(`/${ProjectName}/join/${roomid}`);
+    await axios.post(url);
     res.status(200).send();
 })
 

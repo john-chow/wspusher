@@ -1,8 +1,8 @@
 const Config = require('./../config.json')
-Redis = require('./../../mock/Redis');
+let Redis = require('ioredis');
 
 exports.getClient = () => {
-    let client = new Redis();
+    let client = new Redis(Config.redis);
     return client;
 }
 
@@ -10,12 +10,13 @@ exports.genRoomkey = (project, room) => {
     return `${project}:R:${room}`
 }
 
-exports.genQueuekey = (project, userid) => {
-    return `${project}:Q:${userid}`
+exports.genUserKey = (project, userid) => {
+    return `${project}:U:${userid}`
 }
 
-exports.genSocketkey = (project, userid) => {
-    return `${project}:S:${userid}`
+exports.genQueuekey = (project, socketid) => {
+    return `${project}:Q:${socketid}`
 }
 
 exports.Channel = `${Config.channel}:message`
+exports.defaultClient = exports.getClient();

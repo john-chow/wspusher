@@ -5,5 +5,11 @@
     "rpcport":  8091,
     "channel":  "common",
     "DEFT_NUM_MESSAGES_TO_PULL":  20,
-    "redisQueueExpires": 86400
+    "redis":    {
+        "host":     "120.79.184.117",
+        "port":     6379,
+        "password": "Front@123456"
+    },
+    "redisQueueExpires": 86400,
+    "redisRoomExpires":  86400
 }

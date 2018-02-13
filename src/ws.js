@@ -1,14 +1,21 @@
-var app = require('express')();
-var http = require('http').Server(app);
-var io = require('socket.io')(http);
-var redis = require('./redis/redis')
-var consumer = require('./redis/consumer');
+const app = require('express')();
+const http = require('http').Server(app);
+const io = require('socket.io')(http);
+const Producer = require('./redis/producer');
 
-io.on('connection', function(socket) {
-  console.log('a user connected');
+const redis = require('./redis/redis');
+var redisClient = redis.defaultClient;
+var consumer = require('./redis/consumer');
+const producer = new Producer(redisClient);
+
+io.on('connection', async function(socket) {
+  console.log(`Ws Connected! socket id is ${socket.id}`);
   let {project, userid} = socket.handshake.query;
-  let key = redis.genSocketkey(project, userid);
-  consumer.userSocketMap[key] = socket;
+  await consumer.addConsumer(project, socket.id);
+  await producer.joinRoom(
+    project, `user-${userid}`, socket.id
+  );
+  await consumer.addUserConsumer(project, userid, socket.id);
 });
 
 const Port = require('./config.json').wsport;

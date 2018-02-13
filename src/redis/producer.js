@@ -6,13 +6,14 @@ class Producer {
         this.redisclient = redis.getClient();
     }
     async broadcast(project, room, message) {
-        let roomkey = redis.genRoomkey(room);
+        let roomkey = redis.genRoomkey(project, room);
         let users = await [];
-        users.map((uid) => {
-            let queuekey = genQueueKey(uid);
+        let sockets = [];
+        sockets.map((socketid) => {
+            let queuekey = redis.genQueuekey(project, socketid);
             this.redisclient.rpushx(queuekey, message);
         })
-        await this.redisclient.publish(redis.Channel, users.join(','))
+        await this.redisclient.publish(redis.Channel, sockets.join(','))
     }
     notice(project, userid, message) {
         let queuekey = redis.genQueuekey(project, userid);
