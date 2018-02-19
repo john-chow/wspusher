@@ -11,39 +11,48 @@ subscribeClient
     });
 subscribeClient
     .on('message', (channel, message) => {
-        let [project, userids] = message.split('-');
-        let ids = userids.split(',');
-        ids.map((uid) => {
-            pullMessage(project, uid)
-        })
+        let [project, c] = message.split(`${Config.projectConsumerSpliter}`);
+        let consumers = c.split(`${Config.consumerSplitter}`);
+        consumers.map(cid => pullMessage(project, cid));
     });
 
 exports.addConsumer = async (project, consumerId) => {
     let queuekey = redis.genQueuekey(project, consumerId);
     let res = await redisClient.lindex(queuekey, 0);
-    if (!res)   redisClient.rpush(queuekey, '1')
+    if (!res)   redisClient.rpush(queuekey, '1');
     redisClient.expire(queuekey, Config.redisQueueExpires);
 }
 
+/*
+ * 用户新增端连接
+ */
 exports.addUserConsumer = async (project, userId, consumerId) => {
-    let userkey = redis.genUserKey(project, userId);
+    let userRoomKey = redis.genUsRoomkey(project, userId);
     await (
-        redisClient.sadd(userkey, consumerId),
-        redisClient.expire(userkey, Config.redisRoomExpires)
+        redisClient.sadd(userRoomKey, consumerId),
+        redisClient.expire(userRoomKey, Config.redisRoomExpires)
     )
+    // 用户暂存的消息，发送到端队列
+    let userMsgKey = redis.genUserMsgKey(project, userId);
+    let messages = await messageClient.lrange(userMsgKey, 0, Config.DEFT_NUM_MESSAGES_TO_PULL);
+    if (messages.length > 0) {
+        let queuekey = redis.genQueuekey(project, consumerId);
+        await redisClient.rpush(queuekey, ...messages);
+    }
 }
 
 exports.removeUserConsumer = async (project, userId, consumerId) => {
-    let userkey = redis.genUserKey(project, userId);
-    redisClient.srem(userkey, consumerId);
+    let userRoomKey = redis.genUsRoomkey(project, userId);
+    redisClient.srem(userRoomKey, consumerId);
 }
 
-function pullMessage(project, uid) {
-    let queuekey = redis.genQueuekey(project, uid);
-    let messages = messageClient.lrange(queuekey, 0, Config.DEFT_NUM_MESSAGES_TO_PULL);
-    let socket = exports.userSocketMap[redis.genSocketkey(project, uid)];
-    socket.emit(project, messages);
-    messageClient.ltrim(queuekey, 0, messages.length);
+async function pullMessage(project, consumerId) {
+    let queuekey = redis.genQueuekey(project, consumerId);
+    let messages = await messageClient.lrange(queuekey, 1, Config.DEFT_NUM_MESSAGES_TO_PULL);
+    let socket = exports.socketsMap[`${consumerId}`];
+    if (socket && messages && messages.length>0) {
+        socket.emit(project, messages);
+        await messageClient.ltrim(queuekey, messages.length, -1);
+    }
 }
 exports.pullMessage = pullMessage
-exports.userSocketMap = {}

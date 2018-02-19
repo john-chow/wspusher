@@ -9,14 +9,21 @@ var consumer = require('./redis/consumer');
 const producer = new Producer(redisClient);
 
 io.on('connection', async function(socket) {
-  console.log(`Ws Connected! socket id is ${socket.id}`);
+  let consumerId = socket.id;
+  console.log(`Ws Connected! socket id is ${consumerId}`);
   let {project, userid} = socket.handshake.query;
-  await consumer.addConsumer(project, socket.id);
-  await producer.joinRoom(
-    project, `user-${userid}`, socket.id
-  );
-  await consumer.addUserConsumer(project, userid, socket.id);
+  await Promise.all([
+    consumer.addConsumer(project, consumerId),
+    consumer.addUserConsumer(project, userid, consumerId)
+  ]);
+  await consumer.pullMessage(project, consumerId);
 });
+
+Object.defineProperty(consumer, "socketsMap", {
+  get:  () => {
+    return io.sockets.sockets || {}; 
+  }
+})
 
 const Port = require('./config.json').wsport;
 http.listen(Port, function(){

@@ -18,7 +18,6 @@ app.post('/:project/broadcast', function(req, res) {
 app.post('/:project/notice/:userid', function(req, res) {
     let project = req.params.project,
         userid = req.params.userid;
-    console.log(req.body);
     let {message} = req.body;
     app.producer.notice(project, userid, message);
     res.status(200).send();

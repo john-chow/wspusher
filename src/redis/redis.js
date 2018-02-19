@@ -10,8 +10,12 @@ exports.genRoomkey = (project, room) => {
     return `${project}:R:${room}`
 }
 
-exports.genUserKey = (project, userid) => {
-    return `${project}:U:${userid}`
+exports.genUsRoomkey = (project, userId) => {
+    return exports.genRoomkey(project, `user-${userId}`);
+}
+
+exports.genUserMsgKey = (project, userid) => {
+    return `${project}:S:${userid}`
 }
 
 exports.genQueuekey = (project, socketid) => {
