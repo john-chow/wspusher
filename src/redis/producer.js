@@ -71,9 +71,9 @@ class Producer {
         let roomkey = redis.genRoomkey(project, room);
         await this.redisclient.hdel(roomkey, userid);
     }
-    clearRoom(project, room) {
+    async clearRoom(project, room) {
         let roomkey = redis.genRoomkey(project, room);
-        return this.redisclient.del(roomkey);
+        return await this.redisclient.del(roomkey);
     }
 }
 

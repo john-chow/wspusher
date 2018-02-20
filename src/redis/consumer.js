@@ -29,10 +29,10 @@ exports.addConsumer = async (project, consumerId) => {
  */
 exports.addUserConsumer = async (project, userId, consumerId) => {
     let userRoomKey = redis.genUsRoomkey(project, userId);
-    await (
+    await Promise.all([
         redisClient.sadd(userRoomKey, consumerId),
         redisClient.expire(userRoomKey, Config.redisRoomExpires)
-    )
+    ]);
     // 用户暂存的消息，发送到端队列
     let userMsgKey = redis.genUserMsgKey(project, userId);
     let messages = await messageClient.lrange(userMsgKey, 0, Config.DEFT_NUM_MESSAGES_TO_PULL);
@@ -59,7 +59,6 @@ async function pullMessage(project, consumerId) {
     let queuekey = redis.genQueuekey(project, consumerId);
     let messages = await messageClient.lrange(queuekey, 1, Config.DEFT_NUM_MESSAGES_TO_PULL);
     let socket = exports.socketsMap[`${consumerId}`];
-    console.log(project);
     if (socket && messages && messages.length>0) {
         socket.emit(project, messages);
         await messageClient.ltrim(queuekey, messages.length, -1);

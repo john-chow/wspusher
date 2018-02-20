@@ -12,6 +12,7 @@ app.producer = new Producer();
 app.post('/:project/broadcast', function(req, res) {
     let project = req.params.project,
         {room, message} = req.body;
+    room = room || '';
     logger.info(`RPC to broadcast! Project is ${project}, room is ${room}`);
     app.producer.broadcast(project, room, message);
 });
@@ -25,18 +26,18 @@ app.post('/:project/notice/:userid', function(req, res) {
     res.status(200).send();
 });
 
-app.post('/:project/join/:roomid', function(req, res) {
+app.post('/:project/join/:room', function(req, res) {
     let project = req.params.project,
-        roomid = req.params.roomid;
-    logger.info(`RPC to join room! Project is ${project}, roomid is ${roomid}`);
-    app.producer.joinRoom(project, roomid, userid);
+        room = req.params.room;
+    logger.info(`RPC to join room! Project is ${project}, room is ${room}`);
+    app.producer.joinRoom(project, room, userid);
 });
 
-app.post('/:project/leave/:roomid', function(req, res) {
+app.post('/:project/leave/:room', function(req, res) {
     let project = req.params.project,
-        roomid = req.params.roomid;
-    logger.info(`RPC to leave room! Project is ${project}, roomid is ${roomid}`);
-    app.producer.leaveRoom(project, roomid, userid);
+        room = req.params.room;
+    logger.info(`RPC to leave room! Project is ${project}, room is ${room}`);
+    app.producer.leaveRoom(project, room, userid);
 })
 
 const Port = require('./config.json').rpcport;
