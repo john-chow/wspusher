@@ -10,8 +10,8 @@
         "port":     6379,
         "password": "Front@123456"
     },
-    "redisQueueExpires": 30,
-    "redisRoomExpires":  30,
+    "redisQueueExpires": 300,
+    "redisRoomExpires":  300,
     "consumerSplitter":  ";",
     "projectConsumerSpliter":   "---"
 }

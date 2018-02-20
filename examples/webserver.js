@@ -43,13 +43,17 @@ app.get('/joinroom/:roomid', async (req, res) => {
     res.status(200).send();
 })
 
-app.get('/broadcast', function(req, res) {
-    http.get({
-        host:   'localhost',
-        port:   8090,
-        method: 'GET'
-    }, (res) => {
-    })
+app.post('/broadcast', function(req, res) {
+    let {content} = req.body;
+    axios({
+        baseURL:    `http://${Config.rpcserver}:${Config.rpcport}`,
+        url:        `/${ProjectName}/broadcast`,  
+        method:     'post',
+        data:   {
+            message:    content
+        }
+    });
+    res.status(200).send();
 })
 
 http.createServer(app).listen(3000);

@@ -6,20 +6,35 @@ class Producer {
         this.redisclient = redis.getClient();
     }
     async broadcast(project, room, message) {
-        let socketid_list = [],
+        let received_consumers = [],
             roomkey = redis.genRoomkey(project, room),
-            userid_list = await this.redisclient.hkeys(roomkey);
-        let p = [];
-        userid_list.forEach(async function(userid) {
-            let userRoomKey = redis.genRoomkey(project, userid);
-            let temp_socketid_list = await this.redisclient.hkeys(userRoomKey);
-            temp_socketid_list.forEach((socketid) => {
-                this.redisclient.rpushx(socketid, message);
-            });
-            socketid_list = socketid_list.concat(temp_socketid_list);
+            users = await this.redisclient.hkeys(roomkey);
+        let p = users.map(async uid => {
+            let userRoomKey = redis.genUsRoomkey(project, uid);
+            let consumers = await this.redisclient.smembers(userRoomKey);
+            if (consumers.length > 0) {
+                let pp = consumers.map(
+                    cid => this.redisclient.rpushx(redis.genQueuekey(project, cid), message)
+                );
+                await Promise.all(pp);
+                console.log(`consumers length is ${consumers.length}`);
+                received_consumers = received_consumers.concat(consumers);
+            } else {
+                let userMsgKey = redis.genUserMsgKey(project, uid);
+                await this.redisclient.rpushx(userMsgKey, message);
+            }
         }, this);
-        let socketid_list_str = socketid_list.join(',');
-        await this.redisclient.publish(redis.Channel, `${project}-${socketid_list_str}`);
+        await Promise.all(p);
+        console.log(`received consumers length is ${received_consumers.length}`);
+        if (received_consumers.length > 0) {
+            let rc = received_consumers.join(Config.consumerSplitter);
+            await this.redisclient.publish(
+                redis.Channel, 
+                `${project}${Config.projectConsumerSpliter}${rc}`
+            );
+        }
+        console.log('xyzasdadf');
+        console.log(received_consumers);
     }
     /*
      * 定向用户推送消息
@@ -45,10 +60,10 @@ class Producer {
             this.redisclient.rpushx(userMsgKey, message);
         }
     }
-    async joinRoom(project, room, userid) {
+    async joinRoom(project, room, key) {
         let roomkey = redis.genRoomkey(project, room);
         let res = await Promise.all([
-            this.redisclient.hset(roomkey, userid, 1),
+            this.redisclient.hset(roomkey, key, 1),
             this.redisclient.expire(roomkey, Config.redisQueueExpires)
         ]);
         return res;

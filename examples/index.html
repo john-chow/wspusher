@@ -33,11 +33,23 @@
           console.log(messages);
         })
         $('form').submit(function() {
+          /*
           $.ajax({
             url:    '/emit',
             type:   'POST',
             data:   {
               content:  $('#m').val(),
+            },
+            success:  function() {
+              $('#m').val('');
+            }
+          })
+          */
+          $.ajax({
+            url:    '/broadcast',
+            type:   'POST',
+            data:   {
+              content:  $('#m').val()
             },
             success:  function() {
               $('#m').val('');

@@ -14,7 +14,8 @@ io.on('connection', async function(socket) {
   let {project, userid} = socket.handshake.query;
   await Promise.all([
     consumer.addConsumer(project, consumerId),
-    consumer.addUserConsumer(project, userid, consumerId)
+    consumer.addUserConsumer(project, userid, consumerId),
+    producer.joinRoom(project, '', userid)
   ]);
   await consumer.pullMessage(project, consumerId);
 });

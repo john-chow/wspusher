@@ -7,6 +7,7 @@ exports.getClient = () => {
 }
 
 exports.genRoomkey = (project, room) => {
+    room = room || '';
     return `${project}:R:${room}`
 }
 

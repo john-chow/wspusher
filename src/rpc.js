@@ -9,9 +9,9 @@ const Producer = require('./redis/producer')
 app.producer = new Producer();
 
 app.post('/:project/broadcast', function(req, res) {
+    console.log('123456789');
     let project = req.params.project,
-        room = '',
-        message = '';
+        {room, message} = req.body;
     app.producer.broadcast(project, room, message);
 });
 

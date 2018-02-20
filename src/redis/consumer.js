@@ -13,6 +13,7 @@ subscribeClient
     .on('message', (channel, message) => {
         let [project, c] = message.split(`${Config.projectConsumerSpliter}`);
         let consumers = c.split(`${Config.consumerSplitter}`);
+        console.log(consumers.length);
         consumers.map(cid => pullMessage(project, cid));
     });
 
@@ -50,6 +51,7 @@ async function pullMessage(project, consumerId) {
     let queuekey = redis.genQueuekey(project, consumerId);
     let messages = await messageClient.lrange(queuekey, 1, Config.DEFT_NUM_MESSAGES_TO_PULL);
     let socket = exports.socketsMap[`${consumerId}`];
+    console.log(project);
     if (socket && messages && messages.length>0) {
         socket.emit(project, messages);
         await messageClient.ltrim(queuekey, messages.length, -1);
