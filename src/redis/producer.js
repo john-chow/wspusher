@@ -33,7 +33,6 @@ class Producer {
                 `${project}${Config.projectConsumerSpliter}${rc}`
             );
         }
-        console.log('xyzasdadf');
         console.log(received_consumers);
     }
     /*

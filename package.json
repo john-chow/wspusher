@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "cross-env NODE_ENV=production nodemon index.js",
+    "start": "cross-env NODE_ENV=development nodemon index.js",
     "debug": "concurrently \"cross-env NODE_ENV=development npm start\" \"nodemon examples\\webserver.js \""
   },
   "author": "",
@@ -15,7 +15,8 @@
     "body-parser": "^1.18.2",
     "express": "^4.16.2",
     "ioredis": "^3.2.1",
-    "socket.io": "^2.0.4"
+    "socket.io": "^2.0.4",
+    "winston": "^3.0.0-rc1"
   },
   "devDependencies": {
     "concurrently": "^3.5.1",

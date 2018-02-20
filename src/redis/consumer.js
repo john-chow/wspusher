@@ -42,9 +42,17 @@ exports.addUserConsumer = async (project, userId, consumerId) => {
     }
 }
 
+exports.updateConsumer = async (project, userId, consumerId) => {
+    let userRoomKey = redis.genUsRoomkey(project, userId);
+    await Promise.all([
+        exports.addUserConsumer(project, userId, consumerId),
+        redisClient.expire(userRoomKey, Config.redisRoomExpires)
+    ])
+}
+
 exports.removeUserConsumer = async (project, userId, consumerId) => {
     let userRoomKey = redis.genUsRoomkey(project, userId);
-    redisClient.srem(userRoomKey, consumerId);
+    await redisClient.srem(userRoomKey, consumerId);
 }
 
 async function pullMessage(project, consumerId) {
