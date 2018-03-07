@@ -13,7 +13,6 @@ subscribeClient
     .on('message', (channel, message) => {
         let [project, c] = message.split(`${Config.projectConsumerSpliter}`);
         let consumers = c.split(`${Config.consumerSplitter}`);
-        console.log(consumers.length);
         consumers.map(cid => pullMessage(project, cid));
     });
 

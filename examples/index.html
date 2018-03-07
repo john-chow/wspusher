@@ -18,17 +18,20 @@
     <form action="">
       <input id="m" autocomplete="off" /><button>Send</button>
     </form>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.7.3/socket.io.min.js"></script>
     <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.7.3/socket.io.min.js"></script>
+    <script src="/static/wspusher-client.js"></script>
     <script>
       const ProjectName = 'WspusherDemo'
       $(function () {
-        var socket = io('http://localhost:8090', {
-          query:  {project: ProjectName, userid: 1}
-        });
-        socket.on(ProjectName, function(messages) {
+        var client = new WspusherClient(
+          'http://localhost:8090', {
+            query:  {project: ProjectName, userid: 1}
+          }
+        );
+        client.on(ProjectName, function(messages) {
           messages.forEach(function(element) {
-            alert(`Websocket推送: ${element}`);
+            console.log(`Websocket推送: ${element}`);
           }, this);
           console.log(messages);
         })

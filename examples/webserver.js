@@ -3,11 +3,11 @@ var app = express()
 const http = require('http')
 const qs = require('querystring'); 
 const axios = require('axios');
-const Utils = require('./utils');
 
 var bodyParser = require('body-parser');
 app.use(bodyParser.json()); // support json encoded bodies
 app.use(bodyParser.urlencoded({ extended: true })); // support encoded bodies
+app.use('/static', express.static('./examples'));
 
 const Config = require('./../src/config.json')
 const ProjectName = 'WspusherDemo'
@@ -38,8 +38,6 @@ app.post('/emit', function(req, res) {
 })
 
 app.get('/joinroom/:roomid', async (req, res) => {
-    let url = Utils.composeRpcUrl(`/${ProjectName}/join/${roomid}`);
-    await axios.post(url);
     res.status(200).send();
 })
 
@@ -56,4 +54,5 @@ app.post('/broadcast', function(req, res) {
     res.status(200).send();
 })
 
-http.createServer(app).listen(3000);
+app.listen(3000)
+//http.createServer(app).listen(3000);

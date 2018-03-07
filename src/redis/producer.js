@@ -17,7 +17,6 @@ class Producer {
                     cid => this.redisclient.rpushx(redis.genQueuekey(project, cid), message)
                 );
                 await Promise.all(pp);
-                console.log(`consumers length is ${consumers.length}`);
                 received_consumers = received_consumers.concat(consumers);
             } else {
                 let userMsgKey = redis.genUserMsgKey(project, uid);
@@ -25,7 +24,6 @@ class Producer {
             }
         }, this);
         await Promise.all(p);
-        console.log(`received consumers length is ${received_consumers.length}`);
         if (received_consumers.length > 0) {
             let rc = received_consumers.join(Config.consumerSplitter);
             await this.redisclient.publish(
@@ -33,7 +31,6 @@ class Producer {
                 `${project}${Config.projectConsumerSpliter}${rc}`
             );
         }
-        console.log(received_consumers);
     }
     /*
      * 定向用户推送消息
