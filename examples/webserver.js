@@ -17,11 +17,11 @@ app.get('/', function(req, res) {
 })
 
 app.post('/emit', function(req, res) {
-    let {content} = req.body;
+    let {content, uid} = req.body;
     let r = http.request({
         host:   Config.rpcserver,
         port:   Config.rpcport,
-        path:   `/${ProjectName}/notice/1`,
+        path:   `/${ProjectName}/notice/${uid}`,
         method: 'POST',
         headers: {  
             'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'  
@@ -37,7 +37,18 @@ app.post('/emit', function(req, res) {
     res.status(200).send();
 })
 
-app.get('/joinroom/:roomid', async (req, res) => {
+app.post('/joinroom/:room', async (req, res) => {
+    let room = req.params.room,
+        {uids} = req.body;
+    await axios({
+        baseURL:    `http://${Config.rpcserver}:${Config.rpcport}`,
+        url:        `/${ProjectName}/join/${room}`,  
+        method:     'post',
+        data:   {
+            uids
+        }
+    })
+    console.log('joinroom response');
     res.status(200).send();
 })
 

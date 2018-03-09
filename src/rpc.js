@@ -28,9 +28,12 @@ app.post('/:project/notice/:userid', function(req, res) {
 
 app.post('/:project/join/:room', function(req, res) {
     let project = req.params.project,
-        room = req.params.room;
+        room = req.params.room,
+        {uids} = req.body;
+    uids = JSON.parse(uids);
     logger.info(`RPC to join room! Project is ${project}, room is ${room}`);
-    app.producer.joinRoom(project, room, userid);
+    app.producer.joinRoom(project, room, uids);
+    res.status(200).send();
 });
 
 app.post('/:project/leave/:room', function(req, res) {
@@ -38,6 +41,7 @@ app.post('/:project/leave/:room', function(req, res) {
         room = req.params.room;
     logger.info(`RPC to leave room! Project is ${project}, room is ${room}`);
     app.producer.leaveRoom(project, room, userid);
+    res.status(200).send();
 })
 
 const Port = require('./config.json').rpcport;

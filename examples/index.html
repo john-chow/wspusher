@@ -22,11 +22,22 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.7.3/socket.io.min.js"></script>
     <script src="/static/wspusher-client.js"></script>
     <script>
-      const ProjectName = 'WspusherDemo'
+      const ProjectName = 'WspusherDemo';
+      const Uid = 2;
+      $.ajax({
+        url:    `/joinroom/room1`,
+        type:   'POST',
+        data:   {
+          uids:   JSON.stringify([Uid])
+        },
+        success:  function() {
+        }
+      });
+
       $(function () {
         var client = new WspusherClient(
           'http://localhost:8090', {
-            query:  {project: ProjectName, userid: 1}
+            query:  {project: ProjectName, userid: Uid}
           }
         );
         client.on(ProjectName, function(messages) {
@@ -36,18 +47,18 @@
           console.log(messages);
         })
         $('form').submit(function() {
-          /*
           $.ajax({
             url:    '/emit',
             type:   'POST',
             data:   {
               content:  $('#m').val(),
+              uid:   Uid
             },
             success:  function() {
               $('#m').val('');
             }
           })
-          */
+          /*
           $.ajax({
             url:    '/broadcast',
             type:   'POST',
@@ -58,6 +69,7 @@
               $('#m').val('');
             }
           })
+          */
           return false;
         });
       });

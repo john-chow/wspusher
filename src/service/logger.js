@@ -1,8 +1,17 @@
 const winston = require('winston');
+const { combine, timestamp, label, printf } = winston.format;
+
+const myFormat = printf(info => {
+  return `${info.timestamp} [${info.label}] ${info.level}: ${info.message}`;
+});
 
 const logger = winston.createLogger({
     level:  'debug',
-    format: winston.format.json(),
+    format: combine(
+      label({label: ' '}),
+      timestamp(),
+      myFormat
+    ),
     transports: [
       //
       // - Write to all logs with level `info` and below to `combined.log` 

@@ -56,17 +56,25 @@ class Producer {
             this.redisclient.rpushx(userMsgKey, message);
         }
     }
-    async joinRoom(project, room, key) {
+    async joinRoom(project, room, uids=[]) {
         let roomkey = redis.genRoomkey(project, room);
-        let res = await Promise.all([
-            this.redisclient.hset(roomkey, key, 1),
-            this.redisclient.expire(roomkey, Config.redisQueueExpires)
-        ]);
-        return res;
+        let p = [];
+        console.log(uids);
+        uids.forEach(function(uid) {
+            p = p.concat([
+                this.redisclient.hset(roomkey, uid, 1),
+                this.redisclient.expire(roomkey, Config.redisQueueExpires)
+            ])
+        }, this);
+        return await Promise.all(p);
     }
-    async leaveRoom(project, room, userid) {
+    async leaveRoom(project, room, uids=[]) {
         let roomkey = redis.genRoomkey(project, room);
-        await this.redisclient.hdel(roomkey, userid);
+        let p = [];
+        uids.forEach(function(uid) {
+            p.push( this.redisclient.hdel(roomkey, uid) );
+        }, this);
+        return await Promise.all(p);
     }
     async clearRoom(project, room) {
         let roomkey = redis.genRoomkey(project, room);
