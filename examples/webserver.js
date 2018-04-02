@@ -3,6 +3,7 @@ var app = express()
 const http = require('http')
 const qs = require('querystring'); 
 const axios = require('axios');
+const Constants = require('./../src/utils/constant');
 
 var bodyParser = require('body-parser');
 app.use(bodyParser.json()); // support json encoded bodies
@@ -16,8 +17,23 @@ app.get('/', function(req, res) {
     res.sendFile(__dirname + '/index.html');
 })
 
-app.post('/emit', function(req, res) {
-    let {content, uid} = req.body;
+app.post('/emit', async function(req, res) {
+    let {content, uid} = req.body,
+        code = Constants.RESP_SUCCESS;
+    await axios({
+        baseURL:    `http://${Config.rpcserver}:${Config.rpcport}`,
+        url:        `/${ProjectName}/notice/${uid}`,
+        method:     'post',
+        data: {
+            message:    content
+        }
+    }).catch(e => {
+        logger.error(``);
+        code = '000001';
+    });
+    res.status(200).send({code});
+
+    /*
     let r = http.request({
         host:   Config.rpcserver,
         port:   Config.rpcport,
@@ -35,6 +51,7 @@ app.post('/emit', function(req, res) {
     r.write(contentstr);
     r.end();
     res.status(200).send();
+    */
 })
 
 app.post('/joinroom/:room', async (req, res) => {

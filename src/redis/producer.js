@@ -1,5 +1,6 @@
 const redis = require('./redis');
 const Config = require('./../config.json');
+const Constants = require('./../utils/constant');
 
 class Producer {
     constructor() {
@@ -40,26 +41,32 @@ class Producer {
         let userRoomKey = redis.genUsRoomkey(project, userId);
         let consumer_list = await this.redisclient.smembers(userRoomKey);
         if (consumer_list.length > 0) {
-            let p = consumer_list.map(
+            this.redisclient.multi();
+            consumer_list.map(
                 cid => this.redisclient.rpushx(
                     redis.genQueuekey(project, cid), message
                 )
             );
-            await Promise.all(p);
             let socketid_list_str = consumer_list.join(`${Config.consumerSplitter}`);
-            await this.redisclient.publish(
+            this.redisclient.publish(
                 redis.Channel, 
                 `${project}${Config.projectConsumerSpliter}${socketid_list_str}`
             );
+            await this.redisclient.exec().catch(e => {
+                logger.error(`notice transaction fail! project is ${project}, userId is ${userId}`);
+                throw new Error({
+                    code: Constants.RESP_REDIS_TRANSACTION,
+                    msg: '保存通知信息失败!'
+                });
+            });
         } else {
             let userMsgKey = redis.genUserMsgKey(project, userId);
-            this.redisclient.rpushx(userMsgKey, message);
+            await this.redisclient.rpushx(userMsgKey, message);
         }
     }
     async joinRoom(project, room, uids=[]) {
         let roomkey = redis.genRoomkey(project, room);
         let p = [];
-        console.log(uids);
         uids.forEach(function(uid) {
             p = p.concat([
                 this.redisclient.hset(roomkey, uid, 1),

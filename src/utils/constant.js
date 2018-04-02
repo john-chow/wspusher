@@ -1,0 +1,6 @@
+exports.RESP_SUCCESS = '000000';
+
+// redis
+exports.RESP_REDIS_TRANSACTION = '500001';
+
+exports.RESP_FAIL_UNKNOWN = '999999';

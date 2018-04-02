@@ -1,5 +1,6 @@
 const redis = require('./redis')
 const Config = require('./../config.json')
+const logger = require('./../service/logger');
 
 const redisClient = redis.defaultClient
 const subscribeClient = redis.getClient()
@@ -13,14 +14,18 @@ subscribeClient
     .on('message', (channel, message) => {
         let [project, c] = message.split(`${Config.projectConsumerSpliter}`);
         let consumers = c.split(`${Config.consumerSplitter}`);
-        consumers.map(cid => pullMessage(project, cid));
+        consumers.map(cid => 
+            pullMessage(project, cid).catch((e) => {
+                logger.error(`pull message fail! project is ${project}, cid is ${cid}`);
+            })
+        );
     });
 
 exports.addConsumer = async (project, consumerId) => {
     let queuekey = redis.genQueuekey(project, consumerId);
     let res = await redisClient.lindex(queuekey, 0);
-    if (!res)   redisClient.rpush(queuekey, '1');
-    redisClient.expire(queuekey, Config.redisQueueExpires);
+    if (!res)   await redisClient.rpush(queuekey, '1');
+    await redisClient.expire(queuekey, Config.redisQueueExpires);
 }
 
 /*
@@ -59,8 +64,8 @@ async function pullMessage(project, consumerId) {
     let messages = await messageClient.lrange(queuekey, 1, Config.DEFT_NUM_MESSAGES_TO_PULL);
     let socket = exports.socketsMap[`${consumerId}`];
     if (socket && messages && messages.length>0) {
-        socket.emit(project, messages);
         await messageClient.ltrim(queuekey, messages.length, -1);
+        socket.emit(project, messages);
     }
 }
 exports.pullMessage = pullMessage

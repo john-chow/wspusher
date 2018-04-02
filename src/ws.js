@@ -13,24 +13,35 @@ io.on('connection', async function(socket) {
   let consumerId = socket.id;
   logger.info(`Consumer Connected! id is ${consumerId}`);
   let {project, userid} = socket.handshake.query;
+  let ready = true;
   await Promise.all([
     consumer.addConsumer(project, consumerId),
     consumer.addUserConsumer(project, userid, consumerId),
     producer.joinRoom(project, '', userid)
-  ]);
-  await consumer.pullMessage(project, consumerId);
+  ]).catch(e => {
+    logger.error(`Consumer connect fail! project is ${project}, userid is ${userid}`);
+    socket.close();
+    ready = false;
+  });
+  if (!ready)   return;
+
+  await consumer
+    .pullMessage(project, consumerId)
+    .catch(e => {
+      logger.error(`pull init message fail! project is ${project}, userid is ${userid}`);
+    });
 
   socket
     .on('heartbeat', () => {
-      console.log('heartbeat......');
+      logger.info('heartbeat......');
       consumer.updateConsumer(project, userid, consumerId)
     })
     .once('disconnect', () => {
-      logger.info(`Consumer Disconnect! id is ${consumerId}`);
+      logger.info(`Consumer Disconnect! project is ${project}, userid is ${userid}`);
       consumer.removeUserConsumer(project, userid, consumerId);
     })
     .once('error', (error) => {
-      logger.error(`Consumer connect error! reason is ${error}`);
+      logger.error(`Consumer connect error! project is ${project}, userid is ${userid}, reason is ${error}`);
       socket.disconnect(true);
     })
 });

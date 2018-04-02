@@ -6,9 +6,9 @@
     "channel":  "common",
     "DEFT_NUM_MESSAGES_TO_PULL":  20,
     "redis":    {
-        "host":     "120.79.184.117",
+        "host":     "193.112.51.36",
         "port":     6379,
-        "password": "Front@123456"
+        "password": "123456"
     },
     "redisQueueExpires": 300,
     "redisRoomExpires":  300,
