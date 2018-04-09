@@ -2,13 +2,13 @@ const winston = require('winston');
 const { combine, timestamp, label, printf } = winston.format;
 
 const myFormat = printf(info => {
-  return `${info.timestamp} [${info.label}] ${info.level}: ${info.message}`;
+  return `[${process.pid}] ${info.timestamp} ${info.label} ${info.level}: ${info.message}`;
 });
 
 const logger = winston.createLogger({
     level:  'debug',
     format: combine(
-      label({label: ' '}),
+      label({label: '--'}),
       timestamp(),
       myFormat
     ),
