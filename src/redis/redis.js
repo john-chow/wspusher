@@ -1,8 +1,25 @@
 const Config = require('./../config.json')
+const logger = require('./../service/logger');
 let Redis = require('ioredis');
 
 exports.getClient = () => {
-    let client = new Redis(Config.redis);
+    let c = Object.assign(
+        {}, 
+        Config.redis, 
+        {
+            // 断线重连策略
+            retryStrategy: function (times) {
+                var delay = Math.min(times * 50, 2000);
+                return delay;
+            }
+        }
+    );
+    let client = new Redis(c);
+    client.on('connect', () => {
+        logger.info(`Connect redis success: ${Config.redis.host}:${Config.redis.port}`);
+    }).on('reconnecting', () => {
+        logger.error(`Reconnecting redis: ${Config.redis.host}:${Config.redis.port}`);
+    });
     return client;
 }
 
