@@ -3,6 +3,7 @@ var app = express()
 const http = require('http')
 const qs = require('querystring'); 
 const axios = require('axios');
+const jwt = require('jsonwebtoken');
 const Constants = require('./../src/utils/constant');
 
 var bodyParser = require('body-parser');
@@ -28,7 +29,7 @@ app.post('/emit', async function(req, res) {
             message:    content
         }
     }).catch(e => {
-        logger.error(``);
+        console.log(`Emit error! e is ${e}`);
         code = '000001';
     });
     res.status(200).send({code});
@@ -65,7 +66,6 @@ app.post('/joinroom/:room', async (req, res) => {
             uids
         }
     })
-    console.log('joinroom response');
     res.status(200).send();
 })
 
@@ -80,6 +80,12 @@ app.post('/broadcast', function(req, res) {
         }
     });
     res.status(200).send();
+})
+
+app.post('/signin', (req, res) => {
+    let {userid} = req.body;
+    let token = jwt.sign({userid}, Constants.TOKEN_SECRET);
+    res.status(200).send({token});
 })
 
 app.listen(3000)

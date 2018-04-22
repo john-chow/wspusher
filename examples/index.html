@@ -24,28 +24,47 @@
     <script>
       const ProjectName = 'WspusherDemo';
       const Uid = 2;
+      let token;
+
       $.ajax({
         url:    `/joinroom/room1`,
         type:   'POST',
         data:   {
           uids:   JSON.stringify([Uid])
-        },
-        success:  function() {
         }
       });
 
       $(function () {
-        var client = new WspusherClient(
-          'http://localhost:8090', {
-            query:  {project: ProjectName, userid: Uid}
-          }
-        );
-        client.on(ProjectName, function(messages) {
-          messages.forEach(function(element) {
-            console.log(`Websocket推送: ${element}`);
-          }, this);
-          console.log(messages);
-        })
+        // 获取token
+        let p = new Promise((resolve, reject) => {
+          $.ajax({
+            url:  '/signin',
+            type: 'POST',
+            data: {userid: Uid},
+            success: resp => {
+              token = resp.token;
+              resolve();
+            }
+          })
+        });
+
+        p.then(() => {
+          var client = new WspusherClient(
+            'http://localhost:8090', {
+              query:  {project: ProjectName, token: token}
+            }
+          );
+          client.on(ProjectName, function(messages) {
+            messages.forEach(function(element) {
+              console.log(`Websocket推送: ${element}`);
+            }, this);
+            console.log(messages);
+          });
+          client.on('disconnect', () => {
+            alert('close');
+          })
+        });
+
         $('form').submit(function() {
           $.ajax({
             url:    '/emit',
