@@ -73,26 +73,36 @@ class Producer {
     }
     async joinRoom(project, room, uids=[]) {
         let roomkey = redis.genRoomkey(project, room);
-        let p = [];
+        let pip = this.redisclient.pipeline();
         uids.forEach(uid => {
-            p = p.concat([
-                this.redisclient.hset(roomkey, uid, 1),
-                this.redisclient.expire(roomkey, Config.redisQueueExpires)
-            ])
+            pip.hset(roomkey, uid, 1);
+            pip.expire(roomkey, Config.redisQueueExpires)
         });
-        return await Promise.all(p);
+        return await pip.exec().then(() => {
+            logger.info(`Producer joinroom success! project is ${project}, room is ${room}, uids is ${uids}`);
+        }).catch(e => {
+            logger.error(`Producer joinroom fail! project is ${project}, room is ${room}, uids is ${uids}, exception is ${e}`);
+        })
     }
     async leaveRoom(project, room, uids=[]) {
         let roomkey = redis.genRoomkey(project, room);
-        let p = [];
-        uids.forEach(function(uid) {
-            p.push( this.redisclient.hdel(roomkey, uid) );
-        }, this);
-        return await Promise.all(p);
+        let pip = this.redisclient.pipeline();
+        uids.forEach(uid => {
+            pip.hdel(roomkey, uid)
+        });
+        return await pip.exec().then(() => {
+            logger.info(`Producer leaveroom success! project is ${project}, room is ${room}, uids is ${uids}`);
+        }).catch(e => {
+            logger.error(`Producer leaveroom fail! project is ${project}, room is ${room}, uids is ${uids}, exception is ${e}`);
+        })
     }
     async clearRoom(project, room) {
         let roomkey = redis.genRoomkey(project, room);
-        return await this.redisclient.del(roomkey);
+        return await this.redisclient.del(roomkey).then(() => {
+            logger.info(`Producer clearroom success! project is ${project}, room is ${room}`);
+        }).catch(e => {
+            logger.error(`Producer clearroom fail! project is ${project}, room is ${room}, exception is ${e}`);
+        });
     }
 }
 

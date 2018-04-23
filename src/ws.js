@@ -67,6 +67,10 @@ Object.defineProperty(consumer, "socketsMap", {
   }
 })
 
+process.on('uncaughtException', function (e) {
+  logger.error(`WS uncaught exception! e is ${e}`);
+});
+
 const Port = require('./config.json').wsport;
 http.listen(Port, function(){
   logger.info(`Ws Server Start! listening on *:${Port}`)

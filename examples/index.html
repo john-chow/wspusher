@@ -65,6 +65,21 @@
           })
         });
 
+
+        for (let i=0; i<100; i++) {
+          $.ajax({
+            url:    '/emit',
+            type:   'POST',
+            data:   {
+              content:  i+'',
+              uid:   Uid
+            },
+            success:  function() {
+            }
+          })
+        }
+
+
         $('form').submit(function() {
           /*
           $.ajax({
