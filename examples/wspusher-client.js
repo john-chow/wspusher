@@ -32,6 +32,7 @@
             .on('disconnect', this._onclose)
             .on('close', this._onclose)
             .on('error', this._onclose)
+            .on('token-unauth', this._ontokenfail)
     }
 
     Client.prototype.request = function() {
@@ -54,6 +55,10 @@
     Client.prototype._onclose = function() {
         console.log('...close...');
         this.connected = false;
+    }
+
+    Client.prototype._ontokenfail = function() {
+        console.log('token verify fail!');
     }
 
     Client.prototype.parse = function() {

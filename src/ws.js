@@ -23,6 +23,7 @@ io.on('connection', async function(socket) {
     decoded = jwt.verify(token, Constants.TOKEN_SECRET);
   } catch (err) {
     logger.warn(`Token verify fail! token is ${token}`);
+    socket.emit('token-unauth');
     socket.disconnect(true);
     return;
   }
