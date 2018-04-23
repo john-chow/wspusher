@@ -42,7 +42,7 @@
             type: 'POST',
             data: {userid: Uid},
             success: resp => {
-              token = 'aaaaaaaaaaa';
+              token = resp.token;
               resolve();
             }
           })
@@ -66,6 +66,7 @@
         });
 
         $('form').submit(function() {
+          /*
           $.ajax({
             url:    '/emit',
             type:   'POST',
@@ -77,7 +78,7 @@
               $('#m').val('');
             }
           })
-          /*
+          */
           $.ajax({
             url:    '/broadcast',
             type:   'POST',
@@ -88,7 +89,6 @@
               $('#m').val('');
             }
           })
-          */
           return false;
         });
       });

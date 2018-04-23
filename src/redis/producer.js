@@ -31,7 +31,11 @@ class Producer {
             await this.redisclient.publish(
                 redis.Channel, 
                 `${project}${Config.projectConsumerSpliter}${rc}`
-            );
+            ).then(() => {
+                logger.info(`Producer broadcast success! project is ${project}`);
+            });
+        } else {
+            logger.info(`Producer broadcast but no consumers! project is ${project}`);
         }
     }
     /*
