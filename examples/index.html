@@ -26,6 +26,7 @@
       const Uid = 2;
       let token;
 
+      /*
       $.ajax({
         url:    `/joinroom/room1`,
         type:   'POST',
@@ -33,6 +34,7 @@
           uids:   JSON.stringify([Uid])
         }
       });
+      */
 
       $(function () {
         // 获取token
@@ -54,30 +56,28 @@
               query:  {project: ProjectName, token: token}
             }
           );
+          client.on('connect', () => {
+            console.log('...connect...');
+            for (let i=0; i<10; i++) {
+              $.ajax({
+                url:    '/emit',
+                type:   'POST',
+                data:   {
+                  content:  i+'',
+                  uid:   Uid
+                },
+                success:  function() {
+                }
+              })
+            }
+          })
           client.on(ProjectName, function(messages) {
-            messages.forEach(function(element) {
-              console.log(`Websocket推送: ${element}`);
-            }, this);
-            console.log(messages);
+            console.log(`Websocket推送:  ${messages}`);
           });
           client.on('disconnect', () => {
             alert('close');
           })
         });
-
-
-        for (let i=0; i<100; i++) {
-          $.ajax({
-            url:    '/emit',
-            type:   'POST',
-            data:   {
-              content:  i+'',
-              uid:   Uid
-            },
-            success:  function() {
-            }
-          })
-        }
 
 
         $('form').submit(function() {
@@ -93,7 +93,6 @@
               $('#m').val('');
             }
           })
-          */
           $.ajax({
             url:    '/broadcast',
             type:   'POST',
@@ -105,6 +104,7 @@
             }
           })
           return false;
+          */
         });
       });
     </script>

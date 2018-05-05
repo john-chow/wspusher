@@ -47,18 +47,12 @@ class Producer {
         let consumer_list = await this.redisclient.smembers(userRoomKey);
         if (consumer_list.length > 0) {
             let pip = this.redisclient.pipeline();
-            consumer_list.map(
-                cid => pip.rpushx(
-                    redis.genQueuekey(project, cid), message
-                )
-            );
-            let socketid_list_str = consumer_list.join(`${Config.consumerSplitter}`);
-            pip.publish(
-                redis.Channel, 
-                `${project}${Config.projectConsumerSpliter}${socketid_list_str}`
-            );
+            consumer_list.forEach(cid => {
+                let qk = redis.genQueuekey(project, cid);
+                pip.rpushx(qk, message)
+            });
             await pip.exec().then(() => {
-                logger.info(`Producer notice success! project is ${project}, userId is ${userId}`);
+                logger.info(`Producer notice success! project is ${project}, userId is ${userId}, message is ${message}`);
             }).catch(e => {
                 logger.error(`Producer notice fail! project is ${project}, userId is ${userId}, exception is ${e}`);
                 throw new Error({
@@ -66,6 +60,12 @@ class Producer {
                     msg: '保存通知信息失败!'
                 });
             });
+            console.log(`consumer list is ${consumer_list}`);
+            let socketid_list_str = consumer_list.join(`${Config.consumerSplitter}`);
+            this.redisclient.publish(
+                redis.Channel, 
+                `${project}${Config.projectConsumerSpliter}${socketid_list_str}`
+            );
         } else {
             let userMsgKey = redis.genUserMsgKey(project, userId);
             await this.redisclient.rpushx(userMsgKey, message);

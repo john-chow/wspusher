@@ -29,10 +29,11 @@ io.on('connection', async function(socket) {
   }
 
   userid = decoded.userid;
+  socket.ioPending = false;
   await Promise.all([
     consumer.addConsumer(project, consumerId),
     consumer.addUserConsumer(project, userid, consumerId),
-    producer.joinRoom(project, '', [userid])
+    producer.joinRoom(project, 'APP', [userid])
   ]).catch(e => {
     logger.error(`Consumer connect fail! project is ${project}, userid is ${userid}, exception is ${e}`);
     socket.disconnect(true);
@@ -47,13 +48,14 @@ io.on('connection', async function(socket) {
     });
 
   socket
-    .on('heartbeat', () => {
+    .on('ping', () => {
       logger.info('heartbeat......');
       consumer.updateConsumer(project, userid, consumerId)
     })
     .once('disconnect', () => {
       logger.info(`Consumer Disconnect! project is ${project}, userid is ${userid}`);
       consumer.removeUserConsumer(project, userid, consumerId);
+      consumer.removeConsumer(project, consumerId);
     })
     .once('error', (error) => {
       logger.error(`Consumer connect error! project is ${project}, userid is ${userid}, reason is ${error}`);

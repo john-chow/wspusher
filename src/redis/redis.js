@@ -28,7 +28,7 @@ exports.genRoomkey = (project, room) => {
 }
 
 exports.genUsRoomkey = (project, userId) => {
-    return exports.genRoomkey(project, `user-${userId}`);
+    return exports.genRoomkey(project, `user${userId}`);
 }
 
 exports.genUserMsgKey = (project, userid) => {

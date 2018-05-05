@@ -6,18 +6,17 @@ const redisClient = redis.defaultClient
 const subscribeClient = redis.getClient()
 const messageClient = redis.getClient()
 
-subscribeClient
-    .subscribe(redis.Channel)
-    .then((err, count) => {
-    });
-subscribeClient
-    .on('message', (channel, message) => {
+subscribeClient.subscribe(redis.Channel);
+subscribeClient.on('message', (channel, message) => {
+        console.log(`receive message ...... ${message}`);
+        logger.info(`Consumer receive msg ${message} from channle ${channel}`);
         let [project, c] = message.split(`${Config.projectConsumerSpliter}`);
         let consumers = c.split(`${Config.consumerSplitter}`);
         consumers.map(cid => 
-            pullMessage(project, cid).catch((e) => {
-                logger.error(`pull message fail! project is ${project}, cid is ${cid}`);
+            pullMessage(project, cid)/*.catch(e => {
+                logger.error(`Pull message fail! project is ${project}, cid is ${cid}, e is ${e}`);
             })
+            */
         );
     });
 
@@ -59,13 +58,26 @@ exports.removeUserConsumer = async (project, userId, consumerId) => {
     await redisClient.srem(userRoomKey, consumerId);
 }
 
+exports.removeConsumer = async (project, consumerId) => {
+    let queuekey = redis.genQueuekey(project, consumerId);
+    await redisClient.del(queuekey);
+}
+
 async function pullMessage(project, consumerId) {
     let queuekey = redis.genQueuekey(project, consumerId);
+    // queuekey在index0的位置，有个哨兵值；因为空list会被自动移除的
     let messages = await messageClient.lrange(queuekey, 1, Config.DEFT_NUM_MESSAGES_TO_PULL);
     let socket = exports.socketsMap[`${consumerId}`];
-    if (socket && messages && messages.length>0) {
-        await messageClient.ltrim(queuekey, messages.length, -1);
-        socket.emit(project, messages);
+    console.log(`------ socketid is ${consumerId}, socket is ${socket}`);
+    if (!socket || socket.ioPending)    return;
+    if (messages && messages.length>0) {
+        socket.ioPending = true;
+        socket.emit(project, messages, async () => {
+            //socket.ioPending = false;
+            console.log('circle call ......');
+            await messageClient.ltrim(queuekey, messages.length+1, -1);
+            pullMessage(...arguments);
+        });
     }
 }
 exports.pullMessage = pullMessage
