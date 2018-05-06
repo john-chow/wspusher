@@ -21,10 +21,12 @@ app.get('/', function(req, res) {
 app.post('/emit', async function(req, res) {
     let {content, uid} = req.body,
         code = Constants.RESP_SUCCESS;
+    console.log(`Emit message is ${content}`);
     await axios({
         baseURL:    `http://${Config.rpcserver}:${Config.rpcport}`,
         url:        `/${ProjectName}/notice/${uid}`,
         method:     'post',
+        httpAgent: new http.Agent({ keepAlive: true }),
         data: {
             message:    content
         }

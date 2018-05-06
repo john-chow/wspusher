@@ -39,9 +39,12 @@
         throw new Error('Not Implement!');
     }
 
-    Client.prototype.on = function() {
+    Client.prototype.on = function(name, callback) {
         if (this.socket) {
-            this.socket.on(...arguments);
+            this.socket.on(name , (data, fn) => {
+                callback(data);
+                fn && fn('1');
+            });
         } else {
             throw new Error('Not Connected Yet!');
         }

@@ -68,14 +68,12 @@ async function pullMessage(project, consumerId) {
     // queuekey在index0的位置，有个哨兵值；因为空list会被自动移除的
     let messages = await messageClient.lrange(queuekey, 1, Config.DEFT_NUM_MESSAGES_TO_PULL);
     let socket = exports.socketsMap[`${consumerId}`];
-    console.log(`------ socketid is ${consumerId}, socket is ${socket}`);
     if (!socket || socket.ioPending)    return;
     if (messages && messages.length>0) {
         socket.ioPending = true;
-        socket.emit(project, messages, async () => {
-            //socket.ioPending = false;
-            console.log('circle call ......');
-            await messageClient.ltrim(queuekey, messages.length+1, -1);
+        socket.emit(project, messages, async (x) => {
+            await messageClient.ltrim(queuekey, messages.length, -1);
+            socket.ioPending = false;
             pullMessage(...arguments);
         });
     }

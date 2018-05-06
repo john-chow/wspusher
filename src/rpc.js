@@ -35,7 +35,7 @@ app.post('/:project/notice/:userid', async function(req, res) {
         code = Constants.RESP_SUCCESS,
         msg = '';
     let {message} = req.body;
-    console.log('RPC get notice from webserver');
+    console.log(`RPC get message is ${message}`);
     await app.producer
              .notice(project, userid, message)
              .then(() => {
