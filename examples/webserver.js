@@ -21,7 +21,7 @@ app.get('/', function(req, res) {
 app.post('/emit', async function(req, res) {
     let {content, uid} = req.body,
         code = Constants.RESP_SUCCESS;
-    console.log(`Emit message is ${content}`);
+    uid = 1;
     await axios({
         baseURL:    `http://${Config.rpcserver}:${Config.rpcport}`,
         url:        `/${ProjectName}/notice/${uid}`,

@@ -8,15 +8,13 @@ const messageClient = redis.getClient()
 
 subscribeClient.subscribe(redis.Channel);
 subscribeClient.on('message', (channel, message) => {
-        console.log(`receive message ...... ${message}`);
         logger.info(`Consumer receive msg ${message} from channle ${channel}`);
         let [project, c] = message.split(`${Config.projectConsumerSpliter}`);
         let consumers = c.split(`${Config.consumerSplitter}`);
         consumers.map(cid => 
-            pullMessage(project, cid)/*.catch(e => {
+            pullMessage(project, cid).catch(e => {
                 logger.error(`Pull message fail! project is ${project}, cid is ${cid}, e is ${e}`);
             })
-            */
         );
     });
 
@@ -42,6 +40,7 @@ exports.addUserConsumer = async (project, userId, consumerId) => {
     if (messages.length > 0) {
         let queuekey = redis.genQueuekey(project, consumerId);
         await redisClient.rpush(queuekey, ...messages);
+        await messageClient.ltrim(userMsgKey, messages.length, -1);
     }
 }
 
@@ -68,7 +67,11 @@ async function pullMessage(project, consumerId) {
     // queuekey在index0的位置，有个哨兵值；因为空list会被自动移除的
     let messages = await messageClient.lrange(queuekey, 1, Config.DEFT_NUM_MESSAGES_TO_PULL);
     let socket = exports.socketsMap[`${consumerId}`];
-    if (!socket || socket.ioPending)    return;
+    if (!socket || socket.ioPending)    {
+        console.log(`socket is ${socket}, ioPending is ${socket && socket.ioPending}`);
+        return;
+    }
+    console.log(`messages is ${messages}`);
     if (messages && messages.length>0) {
         socket.ioPending = true;
         socket.emit(project, messages, async (x) => {

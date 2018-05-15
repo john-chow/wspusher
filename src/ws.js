@@ -49,11 +49,10 @@ io.on('connection', async function(socket) {
 
   socket
     .on('ping', () => {
-      logger.info('heartbeat......');
       consumer.updateConsumer(project, userid, consumerId)
     })
     .once('disconnect', () => {
-      logger.info(`Consumer Disconnect! project is ${project}, userid is ${userid}`);
+      logger.info(`Consumer Disconnect! project is ${project}, userid is ${userid}, consumerid is ${consumerId}`);
       consumer.removeUserConsumer(project, userid, consumerId);
       consumer.removeConsumer(project, consumerId);
     })

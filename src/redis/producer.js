@@ -60,7 +60,6 @@ class Producer {
                     msg: '保存通知信息失败!'
                 });
             });
-            console.log(`consumer list is ${consumer_list}`);
             let socketid_list_str = consumer_list.join(`${Config.consumerSplitter}`);
             this.redisclient.publish(
                 redis.Channel, 
@@ -68,7 +67,8 @@ class Producer {
             );
         } else {
             let userMsgKey = redis.genUserMsgKey(project, userId);
-            await this.redisclient.rpushx(userMsgKey, message);
+            console.log(`Push user message is ${message}`);
+            await this.redisclient.rpush(userMsgKey, message);
         }
     }
     async joinRoom(project, room, uids=[]) {
