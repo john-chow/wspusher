@@ -71,7 +71,6 @@ async function pullMessage(project, consumerId) {
         console.log(`socket is ${socket}, ioPending is ${socket && socket.ioPending}`);
         return;
     }
-    console.log(`messages is ${messages}`);
     if (messages && messages.length>0) {
         socket.ioPending = true;
         socket.emit(project, messages, async (x) => {

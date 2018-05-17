@@ -52,6 +52,7 @@ io.on('connection', async function(socket) {
       consumer.updateConsumer(project, userid, consumerId)
     })
     .once('disconnect', () => {
+      console.log('---------------------');
       logger.info(`Consumer Disconnect! project is ${project}, userid is ${userid}, consumerid is ${consumerId}`);
       consumer.removeUserConsumer(project, userid, consumerId);
       consumer.removeConsumer(project, consumerId);
@@ -70,7 +71,43 @@ Object.defineProperty(consumer, "socketsMap", {
 
 process.on('uncaughtException', function (e) {
   logger.error(`WS uncaught exception! e is ${e}`);
+  process.exit();
 });
+/* Ctrl+c的退出; PM2官方说明restart事件 */
+process.on('SIGINT', () => {
+  console.log('yyyyyyy');
+  io.close(() => {
+    console.log('mmmmmm');
+    process.exit(0);
+  });
+})
+/* nodemon的自动restart */
+process.on('SIGUSR2', () => {
+  console.log('nodemon restart');
+  io.close(() => {
+    gracefulShutdown(function () {
+      process.kill(process.pid, 'SIGUSR2');
+    });
+  })
+})
+
+process.on('SIGKILL', () => {
+  console.log('zzzzzzz');
+  io.close(() => {
+    process.exit(0);
+  });
+})
+
+process.on('message', (message) => {
+  logger.error('Ws will shutdown!');
+  if (message == 'shutdown') {
+    logger.error('Ws will shutdown!');
+    io.close(() => {
+      process.exit(0);
+    });
+
+  }
+})
 
 const Port = require('./config.json').wsport;
 http.listen(Port, function(){

@@ -31,7 +31,8 @@ app.post('/emit', async function(req, res) {
             message:    content
         }
     }).catch(e => {
-        console.log(`Emit error! e is ${e}`);
+
+        console.log(`Webserver emit error! e is ${e}`);
         code = '000001';
     });
     res.status(200).send({code});

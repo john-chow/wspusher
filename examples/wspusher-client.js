@@ -57,6 +57,11 @@
 
     Client.prototype._onclose = function() {
         console.log('...close...');
+        if (this.socket) {
+            this.socket.disconnect();
+            this.socket.close();
+            this.socket = null;
+        }
         this.connected = false;
     }
 
