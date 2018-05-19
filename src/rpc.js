@@ -3,6 +3,25 @@ var http = require('http').Server(app);
 const logger = require('./service/logger');
 const Constants = require('./utils/constant');
 
+/*
+const net = require('net');
+
+const Port = require('./config.json').rpcport;
+let server = net.createServer()
+server.on('connection', socket => {
+    socket.on('data', data => {
+    });
+    socket.on('error', err => {
+    });
+    socket.on('close', data => {
+    });
+});
+server.on('error', err => {
+});
+server.listen(Port);
+*/
+
+
 var bodyParser = require('body-parser');
 app.use(bodyParser.json()); // support json encoded bodies
 app.use(bodyParser.urlencoded({ extended: true })); // support encoded bodies

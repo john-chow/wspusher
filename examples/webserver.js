@@ -3,6 +3,8 @@ var app = express()
 const http = require('http')
 const qs = require('querystring'); 
 const axios = require('axios');
+const request = require('request');
+const rp = require('request-promise');
 const jwt = require('jsonwebtoken');
 const Constants = require('./../src/utils/constant');
 
@@ -21,7 +23,22 @@ app.get('/', function(req, res) {
 app.post('/emit', async function(req, res) {
     let {content, uid} = req.body,
         code = Constants.RESP_SUCCESS;
-    uid = 1;
+    /*
+    await rp({
+        url: `http://${Config.rpcserver}:${Config.rpcport}/${ProjectName}/notice/${uid}`,
+        method: 'post',
+        headers: {
+            forever: true
+        },
+        json: {
+            message: content
+        }
+    }).catch(e => {
+        console.log(`Webserver emit error! e is ${e}`);
+        code = '000001';
+    })
+    */
+
     await axios({
         baseURL:    `http://${Config.rpcserver}:${Config.rpcport}`,
         url:        `/${ProjectName}/notice/${uid}`,
@@ -36,26 +53,6 @@ app.post('/emit', async function(req, res) {
         code = '000001';
     });
     res.status(200).send({code});
-
-    /*
-    let r = http.request({
-        host:   Config.rpcserver,
-        port:   Config.rpcport,
-        path:   `/${ProjectName}/notice/${uid}`,
-        method: 'POST',
-        headers: {  
-            'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'  
-        }
-    }, (res) => {
-        console.log(res.statusCode);
-    })
-    let contentstr = qs.stringify({
-        message:  content
-    });
-    r.write(contentstr);
-    r.end();
-    res.status(200).send();
-    */
 })
 
 app.post('/joinroom/:room', async (req, res) => {

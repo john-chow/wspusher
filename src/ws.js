@@ -52,7 +52,6 @@ io.on('connection', async function(socket) {
       consumer.updateConsumer(project, userid, consumerId)
     })
     .once('disconnect', () => {
-      console.log('---------------------');
       logger.info(`Consumer Disconnect! project is ${project}, userid is ${userid}, consumerid is ${consumerId}`);
       consumer.removeUserConsumer(project, userid, consumerId);
       consumer.removeConsumer(project, consumerId);
@@ -75,15 +74,15 @@ process.on('uncaughtException', function (e) {
 });
 /* Ctrl+c的退出; PM2官方说明restart事件 */
 process.on('SIGINT', () => {
-  console.log('yyyyyyy');
+  logger.warn('Ws process Get SIGINT event!')
   io.close(() => {
-    console.log('mmmmmm');
+    logger.warn('Ws server close successfully!');
     process.exit(0);
   });
 })
 /* nodemon的自动restart */
 process.on('SIGUSR2', () => {
-  console.log('nodemon restart');
+  logger.warn('Ws process Get SIGUSR2 event!')
   io.close(() => {
     gracefulShutdown(function () {
       process.kill(process.pid, 'SIGUSR2');
@@ -92,20 +91,20 @@ process.on('SIGUSR2', () => {
 })
 
 process.on('SIGKILL', () => {
-  console.log('zzzzzzz');
+  logger.warn('Ws process Get SIGKILL event!')
   io.close(() => {
+    logger.warn('Ws server close successfully!');
     process.exit(0);
   });
 })
 
 process.on('message', (message) => {
-  logger.error('Ws will shutdown!');
+  logger.warn('Ws process get shutdown!');
   if (message == 'shutdown') {
-    logger.error('Ws will shutdown!');
+    logger.warn('Ws will shutdown!');
     io.close(() => {
       process.exit(0);
     });
-
   }
 })
 

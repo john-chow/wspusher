@@ -1,7 +1,7 @@
 {
-    "wsserver": "localhost",
+    "wsserver": "193.112.51.36",
     "wsport":   8090,
-    "rpcserver": "localhost",
+    "rpcserver": "193.112.51.36",
     "rpcport":  8091,
     "channel":  "common",
     "DEFT_NUM_MESSAGES_TO_PULL":  20,
