@@ -9,7 +9,7 @@ module.exports = {
     {
       name      : 'RPC',
       script    : './src/rpc.js',
-      instances  : 2,
+      instances  : 1,
       exec_mode  : "cluster",
       env: {
         COMMON_VARIABLE: 'true'
@@ -23,7 +23,7 @@ module.exports = {
     {
       name      : 'WS',
       script    : './src/ws.js',
-      instances  : 2,
+      instances  : 1,
       exec_mode  : "cluster",
     }
   ],
