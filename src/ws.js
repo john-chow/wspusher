@@ -47,8 +47,8 @@ io.on('connection', async function(socket) {
   if (!ready)   return;
 
   logger.info(`Consumer Connected! id is ${consumerId}`);
-  stats.incrConsumers(1);
-  stats.setConsumersStats(Object.keys(io.clients).length);
+  stats.incrConsumers(project, 1);
+  stats.setConsumersStats(project, Object.keys(io.clients).length);
 
   await consumer
     .pullMessage(project, consumerId)
@@ -64,7 +64,7 @@ io.on('connection', async function(socket) {
       logger.info(`Consumer Disconnect! project is ${project}, userid is ${userid}, consumerid is ${consumerId}`);
       consumer.removeUserConsumer(project, userid, consumerId);
       consumer.removeConsumer(project, consumerId);
-      stats.setConsumersStats(Object.keys(io.clients).length);
+      stats.setConsumersStats(project, Object.keys(io.clients).length);
     })
     .once('error', (error) => {
       logger.error(`Consumer connect error! project is ${project}, userid is ${userid}, reason is ${error}`);
