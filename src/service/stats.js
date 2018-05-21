@@ -1,4 +1,4 @@
-const redis = require('./redis')
+const redis = require('./../redis/redis')
 const Config = require('./../config.json');
 const redisClient = redis.defaultClient
 
