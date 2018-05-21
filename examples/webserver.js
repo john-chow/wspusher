@@ -23,6 +23,7 @@ app.get('/', function(req, res) {
 app.post('/emit', async function(req, res) {
     let {content, uid} = req.body,
         code = Constants.RESP_SUCCESS;
+    console.log(req.body);
     /*
     await rp({
         url: `http://${Config.rpcserver}:${Config.rpcport}/${ProjectName}/notice/${uid}`,

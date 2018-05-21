@@ -1,12 +1,12 @@
 {
-    "wsserver": "193.112.51.36",
+    "wsserver": "120.77.150.253",
     "wsport":   8090,
-    "rpcserver": "193.112.51.36",
+    "rpcserver": "120.77.150.253",
     "rpcport":  8091,
     "channel":  "common",
     "DEFT_NUM_MESSAGES_TO_PULL":  20,
     "redis":    {
-        "host":     "193.112.51.36",
+        "host":     "120.77.150.253",
         "port":     6379,
         "password": "123456"
     },

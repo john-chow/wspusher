@@ -13,11 +13,14 @@ const Constants = require('./utils/constant');
 
 io.on('connection', async function(socket) {
   let consumerId = socket.id;
-  logger.info(`Consumer Connected! id is ${consumerId}`);
   let {project, token} = socket.handshake.query,
       ready = true,
       userid;
 
+  project = 'WspusherDemo';
+  userid = 2;
+
+/*
   let decoded;
   try {
     decoded = jwt.verify(token, Constants.TOKEN_SECRET);
@@ -27,8 +30,9 @@ io.on('connection', async function(socket) {
     socket.disconnect(true);
     return;
   }
-
   userid = decoded.userid;
+*/
+
   socket.ioPending = false;
   await Promise.all([
     consumer.addConsumer(project, consumerId),
@@ -40,6 +44,7 @@ io.on('connection', async function(socket) {
     ready = false;
   });
   if (!ready)   return;
+  logger.info(`Consumer Connected! id is ${consumerId}`);
 
   await consumer
     .pullMessage(project, consumerId)
@@ -88,14 +93,6 @@ process.on('SIGUSR2', () => {
       process.kill(process.pid, 'SIGUSR2');
     });
   })
-})
-
-process.on('SIGKILL', () => {
-  logger.warn('Ws process Get SIGKILL event!')
-  io.close(() => {
-    logger.warn('Ws server close successfully!');
-    process.exit(0);
-  });
 })
 
 process.on('message', (message) => {

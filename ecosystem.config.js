@@ -35,7 +35,7 @@ module.exports = {
   deploy : {
     production : {
       user : 'node',
-      host : '193.112.51.36',
+      host : '120.77.150.253',
       ref  : 'origin/master',
       repo : 'git@github.com:repo.git',
       path : '/var/www/production',
@@ -43,7 +43,7 @@ module.exports = {
     },
     dev : {
       user : 'node',
-      host : '193.112.51.36',
+      host : '120.77.150.253',
       ref  : 'origin/master',
       repo : 'git@github.com:repo.git',
       path : '/var/www/development',
