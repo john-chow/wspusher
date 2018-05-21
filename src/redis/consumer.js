@@ -68,7 +68,6 @@ async function pullMessage(project, consumerId) {
     let messages = await messageClient.lrange(queuekey, 1, Config.DEFT_NUM_MESSAGES_TO_PULL);
     let socket = exports.socketsMap[`${consumerId}`];
     if (!socket || socket.ioPending)    {
-        console.log(`socket is ${socket}, ioPending is ${socket && socket.ioPending}`);
         return;
     }
     if (messages && messages.length>0) {
