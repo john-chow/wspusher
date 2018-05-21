@@ -39,5 +39,13 @@ exports.genQueuekey = (project, socketid) => {
     return `${project}:Q:${socketid}`
 }
 
+exports.genStatsKey = project => {
+    return `${project}:STATS`
+}
+
+exports.genStatsServerKey = project => {
+    return `${project}:STATS:SERVERS`
+}
+
 exports.Channel = `${Config.channel}:message`
 exports.defaultClient = exports.getClient();

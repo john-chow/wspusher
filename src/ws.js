@@ -10,6 +10,7 @@ var redisClient = redis.defaultClient;
 var consumer = require('./redis/consumer');
 const producer = new Producer(redisClient);
 const Constants = require('./utils/constant');
+const stats = require('./service/stats')
 
 io.on('connection', async function(socket) {
   let consumerId = socket.id;
@@ -44,7 +45,10 @@ io.on('connection', async function(socket) {
     ready = false;
   });
   if (!ready)   return;
+
   logger.info(`Consumer Connected! id is ${consumerId}`);
+  stats.incrConsumers(1);
+  stats.setConsumersStats(Object.keys(io.clients).length);
 
   await consumer
     .pullMessage(project, consumerId)
@@ -60,6 +64,7 @@ io.on('connection', async function(socket) {
       logger.info(`Consumer Disconnect! project is ${project}, userid is ${userid}, consumerid is ${consumerId}`);
       consumer.removeUserConsumer(project, userid, consumerId);
       consumer.removeConsumer(project, consumerId);
+      stats.setConsumersStats(Object.keys(io.clients).length);
     })
     .once('error', (error) => {
       logger.error(`Consumer connect error! project is ${project}, userid is ${userid}, reason is ${error}`);
