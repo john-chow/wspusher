@@ -18,10 +18,6 @@ io.on('connection', async function(socket) {
       ready = true,
       userid;
 
-  project = 'WspusherDemo';
-  userid = 2;
-
-/*
   let decoded;
   try {
     decoded = jwt.verify(token, Constants.TOKEN_SECRET);
@@ -32,7 +28,6 @@ io.on('connection', async function(socket) {
     return;
   }
   userid = decoded.userid;
-*/
 
   socket.ioPending = false;
   await Promise.all([
