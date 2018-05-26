@@ -10,7 +10,7 @@ WsPusher是一个基于websocket协议的消息推送系统，现已实现服务
 6、支持基于room和基于全项目的广播消息  
 
 # 流程图
-
+![](https://github.com/john-chow/wspusher/blob/master/20180526160545.jpg)
 
 # benchmark 
 部署在阿里云单核1G内存的云主机，测试结果：   
