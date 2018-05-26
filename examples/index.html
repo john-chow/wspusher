@@ -52,23 +52,25 @@
 
         p.then(() => {
           var client = new WspusherClient(
-            'http://120.77.150.253:8090', {
+            'http://localhost:8090', {
               query:  {project: ProjectName, token: token}
             }
           );
           client.on('connect', () => {
             console.log('...connect...');
             for (let i=0; i<10; i++) {
-              $.ajax({
-                url:    '/emit',
-                type:   'POST',
-                data:   {
-                  content:  i+'',
-                  uid:   Uid
-                },
-                success:  function() {
-                }
-              })
+              setTimeout((function(index) {
+                return () => {$.ajax({
+                  url:    '/emit',
+                  type:   'POST',
+                  data:   {
+                    content:  index+'',
+                    uid:   Uid
+                  },
+                  success:  function() {
+                  }
+                })
+              }})(i), 500)
             }
           })
           client.on(ProjectName, function(messages) {
