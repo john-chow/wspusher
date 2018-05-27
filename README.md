@@ -15,7 +15,7 @@ WsPusher是一个基于websocket协议的消息推送系统，现已实现服务
 # benchmark 
 部署在阿里云单核1G内存的云主机，测试结果:  
 * Consumer端，使用测试工具 [websocket-bench](https://github.com/M6Web/websocket-bench)  
-  最大并发量每秒30请求
+  最大并发量每秒30请求  
   最大可连接数500    
 * Producer端，
   阿里云PTS性能测试结果： 平均TPS为150次/秒
